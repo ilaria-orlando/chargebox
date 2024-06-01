@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}<h1>list of all cars</h1>{% endblock %}
+
+{% block body %} 
+<div>
+    {% for car in cars %}
+        <ul>
+            <li>{{ car.model }}</li>
+            <li>{{ car.batteryCapacity }}</li>
+                {% for person in car.assignedTo %}
+                    <li>{{ person.name }}</li>
+                    <li>{{ person.id }}</li>
+                {% if not loop.last %}, {% endif %}
+                {% endfor %}
+        </ul>
+    {% endfor %}
+</div>
+{% endblock %}

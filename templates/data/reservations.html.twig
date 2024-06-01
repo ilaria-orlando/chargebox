@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}list of all reservations{% endblock %}
+
+{% block body %} 
+<div>
+    {% for reservation in reservations %}
+        <ul>
+            <li>{{ reservation.id }}</li>
+            <li>{{ reservation.connectorId.id }}</li>
+        </ul>
+    {% endfor %}
+</div>
+{% endblock %}
