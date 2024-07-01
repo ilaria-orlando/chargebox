@@ -46,10 +46,8 @@ final class CarFactory extends ModelFactory
      */
     protected function getDefaults(): array
     {
-
         return [
             'batteryCapacity' => '80',
-            'model' => 'TES1', //self::faker()->unique()->randomElement($models),
         ];
     }
 
@@ -66,14 +64,5 @@ final class CarFactory extends ModelFactory
     protected static function getClass(): string
     {
         return Car::class;
-    }
-
-    public static function createSpecificModels(int $count): void
-    {
-        for ($i = 1; $i <= $count; $i++) {
-            //create random person
-            //create model TES1 to TES15
-            $car = self::new(['model' => 'TES' . $i])-> create();
-        }
     }
 }

@@ -46,6 +46,7 @@ final class PersonFactory extends ModelFactory
      */
     protected function getDefaults(): array
     {
+        // generate fake name
         return [
             'name' => self::faker()->name(),
         ];
@@ -66,31 +67,31 @@ final class PersonFactory extends ModelFactory
         return Person::class;
     }
 
-   /**protected function instantiate(array $attributes): object
-    {
-        $id = Uuid::uuid4(); // Generate UUID
-        return new Person($id, $attributes['name']);
-    }
+    /**protected function instantiate(array $attributes): object
+     {
+         $id = Uuid::uuid4(); // Generate UUID
+         return new Person($id, $attributes['name']);
+     }
 
-    //link car to person
-    /**public static function createPersonCarPermissions(int $count): void
-    {
-        //get all cars
-        $cars = CarFactory::repository()->findAll();
+     //link car to person
+     /**public static function createPersonCarPermissions(int $count): void
+     {
+         //get all cars
+         $cars = CarFactory::repository()->findAll();
 
-        for ($i = 1; $i <= $count; $i++) {
-            $person = self::createOne();
+         for ($i = 1; $i <= $count; $i++) {
+             $person = self::createOne();
 
-            foreach($cars as $car) {
+             foreach($cars as $car) {
 
-                if($car->getAssignedTo()->getId() === $person->getId()) {
-                    $person->setCarPermission($car);
-                    break;
-                }
-            }
+                 if($car->getAssignedTo()->getId() === $person->getId()) {
+                     $person->setCarPermission($car);
+                     break;
+                 }
+             }
 
-            $person->save();
+             $person->save();
 
-        }
-    }*/
+         }
+     }*/
 }

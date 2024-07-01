@@ -20,5 +20,18 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    # config/services.yaml
+    App\EventListener\EntityPrePersistListener:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+
+    App\EventSubscriber\CalendarSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+

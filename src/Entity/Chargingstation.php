@@ -6,27 +6,23 @@ use App\Repository\ChargingstationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
-
 
 #[ORM\Entity(repositoryClass: ChargingstationRepository::class)]
 class Chargingstation
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?UuidInterface $id;
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
+    #[ORM\SequenceGenerator(sequenceName: 'chargingstation_sequence', allocationSize: 5, initialValue: 1)]
+    #[ORM\Column]
+    private ?int $id = null;
 
     #[ORM\Column]
     private ?bool $inUse = false;
 
-    /**
-     * @var Collection<int, Connector>
-     */
-    #[ORM\OneToMany(targetEntity:Connector::class, mappedBy:"chargingstation", cascade: ['persist', 'remove'])]
+    #[ORM\Column]
+    private ?string $name = null;
+
+    #[ORM\OneToMany(targetEntity: Connector::class, mappedBy: 'chargingstation', cascade: ['persist', 'remove'])]
     private Collection $connectors;
 
     public function __construct()
@@ -34,47 +30,56 @@ class Chargingstation
         $this->connectors = new ArrayCollection();
     }
 
-    public function getId(): ?UuidInterface
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function isStatus(): ?bool
+    public function isInUse(): ?bool
     {
         return $this->inUse;
     }
 
-    public function setStatus(bool $inUse): static
+    public function setInUse(bool $inUse): static
     {
         $this->inUse = $inUse;
 
         return $this;
     }
 
-    /**
-     * @var Collection<int, Connector>
-     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     public function getConnectors(): Collection
     {
         return $this->connectors;
     }
 
-    public function addConnectors(Connector $connectors): static
+    public function addConnector(Connector $connector): static
     {
-        if (!$this->connectors->contains($connectors)) {
-                $this->connectors->add($connectors);
-                $connectors->addChargingStation($this);
+        if (!$this->connectors->contains($connector)) {
+            $this->connectors->add($connector);
+            $connector->setChargingstation($this);
         }
 
         return $this;
     }
-    
-    public function removeConnectors(Connector $connectors): static
+
+    public function removeConnector(Connector $connector): static
     {
-        if ($this->connectors->removeElement($connectors)) {
+        if ($this->connectors->removeElement($connector)) {
             // Set the owning side to null (unless already changed)
-            if ($connectors->getChargingStation() === $this) {
-                $connectors->removeChargingStation($this);
+            if ($connector->getChargingstation() === $this) {
+                $connector->setChargingstation(null);
             }
         }
 

@@ -3,31 +3,28 @@
 namespace App\Entity;
 
 use App\Repository\ConnectorRepository;
-use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Ramsey\Uuid\UuidInterface;
-
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ConnectorRepository::class)]
 class Connector
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?UuidInterface $id;
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
+    #[ORM\SequenceGenerator(sequenceName: 'connector_sequence', allocationSize: 5, initialValue: 1)]
+    #[ORM\Column]
+    private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity:Chargingstation::class, inversedBy:"connectors")]
-    #[ORM\JoinColumn]
-    private ?Chargingstation $chargingstation;
+    #[ORM\ManyToOne(targetEntity: Chargingstation::class, inversedBy: 'connectors')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Chargingstation $chargingstation = null;
 
-    /**
-     * @var Collection<int, Reservation>
-     */
-    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'connectorId', orphanRemoval: true, cascade: ['persist', 'remove'])]
-    private Collection $reservation;
+    #[ORM\Column]
+    private ?string $name = null;
+
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'connector', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $reservations;
 
     #[ORM\Column(nullable: true)]
     private ?int $wattage = null;
@@ -37,55 +34,59 @@ class Connector
 
     public function __construct()
     {
-        $this->reservation = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
-    public function getId(): ?UuidInterface
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getChargingstation(): Chargingstation
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getChargingstation(): ?Chargingstation
     {
         return $this->chargingstation;
     }
 
-    public function addChargingstation(Chargingstation $chargingstation): static
+    public function setChargingstation(?Chargingstation $chargingstation): static
     {
         $this->chargingstation = $chargingstation;
+
         return $this;
     }
 
-    public function removeChargingstation(): static
+    public function getReservations(): Collection
     {
-        $this->chargingstation = null;
-        return $this;
-    }
-
-    /**
-     * @var Collection<int, Reservation>
-     */
-    public function getreservation(): Collection
-    {
-        return $this->reservation;
+        return $this->reservations;
     }
 
     public function addReservation(Reservation $reservation): static
     {
-        if (!$this->reservation->contains($reservation)) {
-                $this->reservation->add($reservation);
-                $reservation->addConnectorId($this);
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setConnector($this);
         }
 
         return $this;
     }
-    
+
     public function removeReservation(Reservation $reservation): static
     {
-        if ($this->reservation->removeElement($reservation)) {
+        if ($this->reservations->removeElement($reservation)) {
             // Set the owning side to null (unless already changed)
-            if ($reservation->getConnectorId() === $this) {
-                $reservation->removeConnectorId($this);
+            if ($reservation->getConnector() === $this) {
+                $reservation->setConnector(null);
             }
         }
 
@@ -104,12 +105,12 @@ class Connector
         return $this;
     }
 
-    public function isStatus(): ?bool
+    public function isInUse(): ?bool
     {
         return $this->inUse;
     }
 
-    public function setStatus(bool $inUse): static
+    public function setInUse(bool $inUse): static
     {
         $this->inUse = $inUse;
 

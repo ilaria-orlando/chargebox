@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}list of all drivers{% endblock %}
+
+{% block body %} 
+<div>
+    {% for person in people %}
+    <div>
+        <ul>
+            <li>{{ person.name }}</li>
+            {% for car in person.assignedCars %}
+                    <li>{{ car.model }}</li>
+            {% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

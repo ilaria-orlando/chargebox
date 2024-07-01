@@ -3,32 +3,29 @@
 namespace App\Entity;
 
 use App\Repository\CarRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 class Car
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?UuidInterface $id;
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
+    #[ORM\SequenceGenerator(sequenceName: 'car_sequence', allocationSize: 5, initialValue: 1)]
+    #[ORM\Column]
+    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $model = null;
 
     #[ORM\Column]
-    private ?int $batteryCapacity = null;
+    private ?int $batteryCapacity = 80;
 
     /**
      * @var Collection<int, Person>
      */
-    #[ORM\ManyToMany(targetEntity:Person::class, inversedBy:"assignedCars")]
+    #[ORM\ManyToMany(targetEntity: Person::class, inversedBy: 'assignedCars')]
     private Collection $assignedTo;
 
     public function __construct()
@@ -36,7 +33,7 @@ class Car
         $this->assignedTo = new ArrayCollection();
     }
 
-    public function getId(): ?UuidInterface
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -65,7 +62,6 @@ class Car
         return $this;
     }
 
-
     /**
      * @var Collection<int, Person>
      */
@@ -74,12 +70,11 @@ class Car
         return $this->assignedTo;
     }
 
-
     public function addAssignedTo(Person $person): static
     {
-            if (!$this->assignedTo->contains($person)) {
-                $this->assignedTo->add($person);
-                $person->addAssignedCars($this);
+        if (!$this->assignedTo->contains($person)) {
+            $this->assignedTo->add($person);
+            $person->addAssignedCars($this);
         }
 
         return $this;

@@ -5,71 +5,56 @@ namespace App\Entity;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
-use Ramsey\Uuid\UuidInterface;
-
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 class Reservation
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?UuidInterface $id;
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
+    #[ORM\SequenceGenerator(sequenceName: 'reservation_sequence', allocationSize: 5, initialValue: 1)]
+    #[ORM\Column]
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservation', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Person $personId;
+    private ?Person $person;
 
     #[ORM\ManyToOne(inversedBy: 'reservation')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Connector $connectorId;
+    private ?Connector $connector;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $startTime = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $endTime = null;
 
-    public function getId(): ?UuidInterface
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPersonId(): ?Person
+    public function getPerson(): ?Person
     {
-        return $this->personId;
+        return $this->person;
     }
 
-    public function addPersonId(?Person $personId): static
+    public function setPerson(?Person $person): static
     {
-        $this->personId = $personId;
+        $this->person = $person;
 
         return $this;
     }
 
-    public function removePersonId(): static
+    public function getConnector(): ?Connector
     {
-        $this->personId = null;
-        return $this;
+        return $this->connector;
     }
 
-    public function getConnectorId(): ?Connector
+    public function setConnector(?Connector $connector): static
     {
-        return $this->connectorId;
-    }
+        $this->connector = $connector;
 
-    public function addConnectorId(?Connector $connectorId): static
-    {
-        $this->connectorId = $connectorId;
-
-        return $this;
-    }
-
-    public function removeConnectorId(): static
-    {
-        $this->connectorId = null;
         return $this;
     }
 

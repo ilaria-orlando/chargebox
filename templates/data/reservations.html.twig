@@ -2,13 +2,32 @@
 
 {% block title %}list of all reservations{% endblock %}
 
-{% block body %} 
+{% block body %}
 <div>
-    {% for reservation in reservations %}
-        <ul>
-            <li>{{ reservation.id }}</li>
-            <li>{{ reservation.connectorId.id }}</li>
-        </ul>
-    {% endfor %}
+    <div class="m-10">
+        <h2 class="text-2xl m-10">Make a reservation:</h2>
+    </div>
+    <div class="container rounded-lg shadow-lg bg-teal-50 p-15">
+        <div class="p-15 m-15">
+            {{ form(form) }}
+        </div>
+    </div>
 </div>
+<div>
+    <div class="m-10">
+        <h2 class="text-2xl m-10">All reservations:</h2>
+    </div>
+    <div>
+        {% for reservation in reservations %}
+            <div class="container">
+                <ul>
+                    <li>Reservation number: {{ reservation.id }}</li>
+                    <li>{{ reservation.connector.name }}</li>
+                    <li>{{ reservation.person.name }}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
 {% endblock %}

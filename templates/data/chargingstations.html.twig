@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}list of all chargingstations{% endblock %}
+
+{% block body %} 
+<div>
+    <div class="container m-10">
+        <h2 class="text-2xl m-10">All Chargingstations:</h2>
+    </div>
+    <div class="container m-10">
+    {% for station in stations %}
+        <div class="container m-10">
+            <ul>
+                <li>{{ station.name }}</li>
+                {% for connectors in station.connectors %}
+                    <li>{{ connectors.name }}</li>
+                    <li>{{ connectors.inUse }}</li>
+                {% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
